@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Intelligent Logistics Routing System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #1f2937;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        header {
+            background: #1f2937;
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #d1d5db;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        input, select {
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 100%;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        button {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .run-btn {
+            background: #16a34a;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            padding: 7px 12px;
+        }
+
+        .algorithms {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .algorithm-btn {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .algorithm-btn.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        @media(max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .algorithms {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>🚚 Intelligent Logistics Routing System</h1>
+        <p>OS-Based Delivery Task Scheduling & Resource Management</p>
+    </header>
+
+
+    <!-- Add Task -->
+
+    <div class="card">
+
+        <h2>➕ Add Delivery Task</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Location</label>
+                <input id="location" placeholder="e.g. Noida">
+            </div>
+
+            <div>
+                <label>Priority</label>
+                <input id="priority" type="number" min="1" placeholder="1">
+            </div>
+
+            <div>
+                <label>Burst Time</label>
+                <input id="burst" type="number" min="1" placeholder="5">
+            </div>
+
+            <button class="add-btn" onclick="addTask()">
+                Add Task
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Tasks -->
+
+    <div class="card">
+
+        <h2>📦 Delivery Tasks</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Burst Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="taskTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Scheduling -->
+
+    <div class="card">
+
+        <h2>⚙️ CPU Scheduling</h2>
+
+        <p>Select an OS scheduling algorithm:</p>
+
+        <div class="algorithms">
+
+            <button class="algorithm-btn active"
+                    onclick="selectAlgorithm('FCFS', this)">
+                FCFS
+            </button>
+
+            <button class="algorithm-btn"
+                    onclick="selectAlgorithm('SJF', this)">
+                SJF
+            </button>
+
+            <button class="algorithm-btn"
+                    onclick="selectAlgorithm('Priority', this)">
+                Priority
+            </button>
+
+        </div>
+
+        <button class="run-btn" onclick="runScheduler()">
+            ▶ Run Scheduler
+        </button>
+
+    </div>
+
+
+    <!-- Result -->
+
+    <div class="card">
+
+        <h2>📊 Scheduling Result</h2>
+
+        <div id="result">
+
+            <div class="empty">
+                Add delivery tasks and run the scheduler.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let tasks = [];
+
+let taskCounter = 1;
+
+let selectedAlgorithm = "FCFS";
+
+
+function addTask() {
+
+    const location =
+        document.getElementById("location").value;
+
+    const priority =
+        parseInt(document.getElementById("priority").value);
+
+    const burst =
+        parseInt(document.getElementById("burst").value);
+
+
+    if (!location || !priority || !burst) {
+
+        alert("Please fill all fields.");
+
+        return;
+    }
+
+
+    tasks.push({
+
+        id: "D" + taskCounter,
+
+        location: location,
+
+        priority: priority,
+
+        burst: burst
+
+    });
+
+
+    taskCounter++;
+
+
+    document.getElementById("location").value = "";
+
+    document.getElementById("priority").value = "";
+
+    document.getElementById("burst").value = "";
+
+
+    displayTasks();
+
+}
+
+
+function displayTasks() {
+
+    const table =
+        document.getElementById("taskTable");
+
+
+    table.innerHTML = "";
+
+
+    tasks.forEach((task, index) => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${task.id}</td>
+
+            <td>${task.location}</td>
+
+            <td>${task.priority}</td>
+
+            <td>${task.burst}</td>
+
+            <td>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTask(${index})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+
+function deleteTask(index) {
+
+    tasks.splice(index, 1);
+
+    displayTasks();
+
+}
+
+
+function selectAlgorithm(algorithm, button) {
+
+    selectedAlgorithm = algorithm;
+
+
+    document
+        .querySelectorAll(".algorithm-btn")
+        .forEach(btn => {
+
+            btn.classList.remove("active");
+
+        });
+
+
+    button.classList.add("active");
+
+}
+
+
+async function runScheduler() {
+
+    if (tasks.length === 0) {
+
+        alert("Please add at least one task.");
+
+        return;
+
+    }
+
+
+    const response = await fetch("/schedule", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+            tasks: tasks,
+
+            algorithm: selectedAlgorithm
+
+        })
+
+    });
+
+
+    const result =
+        await response.json();
+
+
+    displayResult(result);
+
+}
+
+
+function displayResult(result) {
+
+    let html = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Order</th>
+                    <th>Task</th>
+                    <th>Location</th>
+                    <th>Burst Time</th>
+                    <th>Waiting Time</th>
+                    <th>Turnaround Time</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    result.forEach((task, index) => {
+
+        html += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>${task.id}</td>
+
+                <td>${task.location}</td>
+
+                <td>${task.burst}</td>
+
+                <td>${task.waiting}</td>
+
+                <td>${task.turnaround}</td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    document.getElementById("result").innerHTML = html;
+
+}
+
+</script>
+
+</body>
+</html>
