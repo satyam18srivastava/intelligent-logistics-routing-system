@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,489 +17,945 @@
 
         body {
             background: #f4f6f8;
-            color: #1f2937;
-            padding: 30px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: auto;
+            color: #222;
         }
 
         header {
             background: #1f2937;
             color: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
+            padding: 20px;
+            text-align: center;
         }
 
         header h1 {
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
-        header p {
-            color: #d1d5db;
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
         }
 
         .card {
             background: white;
-            padding: 22px;
+            padding: 25px;
+            margin-bottom: 25px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         h2 {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #2563eb;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .danger {
+            background: #dc2626;
+        }
+
+        .success {
+            background: #16a34a;
+        }
+
+        .warning {
+            background: #d97706;
+        }
+
+        .algorithm-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .algorithm-buttons button.selected {
+            background: #111827;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px;
+            border: 1px solid #ddd;
             text-align: center;
-            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background: #f1f5f9;
+            background: #1f2937;
+            color: white;
         }
 
-        input, select {
-            padding: 9px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            width: 100%;
+        tr:nth-child(even) {
+            background: #f9fafb;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 12px;
-            align-items: end;
-        }
-
-        button {
-            padding: 11px 18px;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
+        .status-assigned {
+            color: #15803d;
             font-weight: bold;
         }
 
-        .add-btn {
-            background: #2563eb;
-            color: white;
-        }
-
-        .run-btn {
-            background: #16a34a;
-            color: white;
-            margin-top: 15px;
-        }
-
-        .delete-btn {
-            background: #dc2626;
-            color: white;
-            padding: 7px 12px;
-        }
-
-        .algorithms {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .algorithm-btn {
-            background: #e5e7eb;
-            color: #111827;
-        }
-
-        .algorithm-btn.active {
-            background: #2563eb;
-            color: white;
-        }
-
-        #result {
-            margin-top: 20px;
+        .status-waiting {
+            color: #dc2626;
+            font-weight: bold;
         }
 
         .empty {
             text-align: center;
+            color: #777;
             padding: 20px;
-            color: #6b7280;
         }
 
-        @media(max-width: 700px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .algorithms {
-                flex-direction: column;
-            }
+        .selected-algorithm {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #2563eb;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
-
     <header>
         <h1>🚚 Intelligent Logistics Routing System</h1>
-        <p>OS-Based Delivery Task Scheduling & Resource Management</p>
+        <p>OS-Based Delivery Scheduling and Resource Allocation</p>
     </header>
 
 
-    <!-- Add Task -->
+    <div class="container">
 
-    <div class="card">
+        <!-- ========================= -->
+        <!-- DELIVERY TASK SECTION -->
+        <!-- ========================= -->
 
-        <h2>➕ Add Delivery Task</h2>
+        <div class="card">
 
-        <div class="form-grid">
+            <h2>📦 Add Delivery Task</h2>
 
-            <div>
-                <label>Location</label>
-                <input id="location" placeholder="e.g. Noida">
+            <div class="form-row">
+
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Delivery Location"
+                >
+
+                <input
+                    type="number"
+                    id="priority"
+                    placeholder="Priority (1 = Highest)"
+                    min="1"
+                >
+
+                <input
+                    type="number"
+                    id="burst"
+                    placeholder="Burst Time"
+                    min="1"
+                >
+
+                <button onclick="addTask()">
+                    Add Task
+                </button>
+
             </div>
 
-            <div>
-                <label>Priority</label>
-                <input id="priority" type="number" min="1" placeholder="1">
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- TASK TABLE -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>📋 Delivery Tasks</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Task ID</th>
+                        <th>Location</th>
+                        <th>Priority</th>
+                        <th>Burst Time</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="taskTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- SCHEDULING SECTION -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>⚙️ CPU Scheduling</h2>
+
+            <div class="algorithm-buttons">
+
+                <button
+                    id="fcfsBtn"
+                    onclick="selectAlgorithm('FCFS')">
+                    FCFS
+                </button>
+
+                <button
+                    id="sjfBtn"
+                    onclick="selectAlgorithm('SJF')">
+                    SJF
+                </button>
+
+                <button
+                    id="priorityBtn"
+                    onclick="selectAlgorithm('Priority')">
+                    Priority
+                </button>
+
             </div>
 
-            <div>
-                <label>Burst Time</label>
-                <input id="burst" type="number" min="1" placeholder="5">
+            <div class="selected-algorithm">
+                Selected Algorithm:
+                <span id="selectedAlgorithm">
+                    None
+                </span>
             </div>
 
-            <button class="add-btn" onclick="addTask()">
-                Add Task
+            <button
+                class="success"
+                onclick="runScheduler()">
+                ▶ Run Scheduler
             </button>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- SCHEDULING RESULT -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>📊 Scheduling Result</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Execution Order</th>
+                        <th>Task ID</th>
+                        <th>Location</th>
+                        <th>Priority</th>
+                        <th>Burst</th>
+                        <th>Waiting Time</th>
+                        <th>Turnaround Time</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="resultTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- VEHICLE SECTION -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>🚛 Vehicle / Resource Management</h2>
+
+            <div class="form-row">
+
+                <input
+                    type="text"
+                    id="vehicleName"
+                    placeholder="Vehicle Name (e.g. Vehicle 1)"
+                >
+
+                <button
+                    class="success"
+                    onclick="addVehicle()">
+                    Add Vehicle
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- VEHICLE TABLE -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>🚚 Available Vehicles</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Vehicle ID</th>
+                        <th>Vehicle Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="vehicleTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ALLOCATION -->
+        <!-- ========================= -->
+
+        <div class="card">
+
+            <h2>🔗 Vehicle Allocation</h2>
+
+            <button
+                class="warning"
+                onclick="allocateVehicles()">
+                🚛 Allocate Vehicles
+            </button>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Task ID</th>
+                        <th>Location</th>
+                        <th>Vehicle</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="allocationTableBody">
+
+                </tbody>
+
+            </table>
 
         </div>
 
     </div>
 
 
-    <!-- Tasks -->
+    <script>
 
-    <div class="card">
+        // =========================
+        // GLOBAL VARIABLES
+        // =========================
 
-        <h2>📦 Delivery Tasks</h2>
+        let tasks = [];
 
-        <table>
+        let vehicles = [];
 
-            <thead>
-                <tr>
-                    <th>Task ID</th>
-                    <th>Location</th>
-                    <th>Priority</th>
-                    <th>Burst Time</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+        let selectedAlgorithm = "";
+        let scheduledTasks = [];
 
-            <tbody id="taskTable">
+        // =========================
+        // ADD TASK
+        // =========================
 
-            </tbody>
+        function addTask() {
 
-        </table>
+            const location =
+                document.getElementById("location").value;
 
-    </div>
+            const priority =
+                parseInt(
+                    document.getElementById("priority").value
+                );
 
-
-    <!-- Scheduling -->
-
-    <div class="card">
-
-        <h2>⚙️ CPU Scheduling</h2>
-
-        <p>Select an OS scheduling algorithm:</p>
-
-        <div class="algorithms">
-
-            <button class="algorithm-btn active"
-                    onclick="selectAlgorithm('FCFS', this)">
-                FCFS
-            </button>
-
-            <button class="algorithm-btn"
-                    onclick="selectAlgorithm('SJF', this)">
-                SJF
-            </button>
-
-            <button class="algorithm-btn"
-                    onclick="selectAlgorithm('Priority', this)">
-                Priority
-            </button>
-
-        </div>
-
-        <button class="run-btn" onclick="runScheduler()">
-            ▶ Run Scheduler
-        </button>
-
-    </div>
+            const burst =
+                parseInt(
+                    document.getElementById("burst").value
+                );
 
 
-    <!-- Result -->
+            if (!location || !priority || !burst) {
 
-    <div class="card">
+                alert("Please enter all task details.");
 
-        <h2>📊 Scheduling Result</h2>
-
-        <div id="result">
-
-            <div class="empty">
-                Add delivery tasks and run the scheduler.
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
+                return;
+            }
 
 
-<script>
+            const task = {
 
-let tasks = [];
+                id: "D" + (tasks.length + 1),
 
-let taskCounter = 1;
+                location: location,
 
-let selectedAlgorithm = "FCFS";
+                priority: priority,
 
+                burst: burst
 
-function addTask() {
-
-    const location =
-        document.getElementById("location").value;
-
-    const priority =
-        parseInt(document.getElementById("priority").value);
-
-    const burst =
-        parseInt(document.getElementById("burst").value);
+            };
 
 
-    if (!location || !priority || !burst) {
+            tasks.push(task);
 
-        alert("Please fill all fields.");
+
+            displayTasks();
+
+
+            document.getElementById("location").value = "";
+
+            document.getElementById("priority").value = "";
+
+            document.getElementById("burst").value = "";
+        }
+
+
+        // =========================
+        // DISPLAY TASKS
+        // =========================
+
+        function displayTasks() {
+
+            const tbody =
+                document.getElementById("taskTableBody");
+
+
+            tbody.innerHTML = "";
+
+
+            if (tasks.length === 0) {
+
+                tbody.innerHTML =
+                    `<tr>
+                        <td colspan="5" class="empty">
+                            No delivery tasks added.
+                        </td>
+                    </tr>`;
+
+                return;
+            }
+
+
+            tasks.forEach((task, index) => {
+
+                const row = document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${task.id}</td>
+
+                    <td>${task.location}</td>
+
+                    <td>${task.priority}</td>
+
+                    <td>${task.burst}</td>
+
+                    <td>
+                        <button
+                            class="danger"
+                            onclick="deleteTask(${index})">
+                            Delete
+                        </button>
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+        }
+
+
+        // =========================
+        // DELETE TASK
+        // =========================
+
+        function deleteTask(index) {
+
+            tasks.splice(index, 1);
+
+            displayTasks();
+        }
+
+
+        // =========================
+        // SELECT ALGORITHM
+        // =========================
+
+        function selectAlgorithm(algorithm) {
+
+            selectedAlgorithm = algorithm;
+
+
+            document.getElementById(
+                "selectedAlgorithm"
+            ).innerText = algorithm;
+
+
+            document
+                .querySelectorAll(".algorithm-buttons button")
+                .forEach(button => {
+
+                    button.classList.remove("selected");
+
+                });
+
+
+            if (algorithm === "FCFS") {
+
+                document
+                    .getElementById("fcfsBtn")
+                    .classList.add("selected");
+
+            }
+
+            else if (algorithm === "SJF") {
+
+                document
+                    .getElementById("sjfBtn")
+                    .classList.add("selected");
+
+            }
+
+            else if (algorithm === "Priority") {
+
+                document
+                    .getElementById("priorityBtn")
+                    .classList.add("selected");
+
+            }
+
+        }
+
+
+        // =========================
+        // RUN SCHEDULER
+        // =========================
+
+        async function runScheduler() {
+
+            if (tasks.length === 0) {
+
+                alert("Please add delivery tasks first.");
+
+                return;
+            }
+
+
+            if (!selectedAlgorithm) {
+
+                alert("Please select a scheduling algorithm.");
+
+                return;
+            }
+
+
+            const response =
+                await fetch("/schedule", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        tasks: tasks,
+
+                        algorithm: selectedAlgorithm
+
+                    })
+
+                });
+
+
+            const result =
+                await response.json();
+
+            scheduledTasks = result;
+
+            displayResult(result);
+        }
+
+
+        // =========================
+        // DISPLAY SCHEDULING RESULT
+        // =========================
+
+        function displayResult(result) {
+
+            const tbody =
+                document.getElementById(
+                    "resultTableBody"
+                );
+
+
+            tbody.innerHTML = "";
+
+
+            result.forEach((task, index) => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${index + 1}</td>
+
+                    <td>${task.id}</td>
+
+                    <td>${task.location}</td>
+
+                    <td>${task.priority}</td>
+
+                    <td>${task.burst}</td>
+
+                    <td>${task.waiting}</td>
+
+                    <td>${task.turnaround}</td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+        }
+
+
+        // =========================
+        // ADD VEHICLE
+        // =========================
+
+        function addVehicle() {
+
+            const name =
+                document.getElementById(
+                    "vehicleName"
+                ).value;
+
+
+            if (!name) {
+
+                alert("Please enter vehicle name.");
+
+                return;
+            }
+
+
+            const vehicle = {
+
+    id: "V" + (vehicles.length + 1),
+
+    name: name,
+
+    status: "Available"
+
+};
+
+
+            vehicles.push(vehicle);
+
+
+            displayVehicles();
+
+
+            document.getElementById(
+                "vehicleName"
+            ).value = "";
+        }
+
+
+        // =========================
+        // DISPLAY VEHICLES
+        // =========================
+
+        function displayVehicles() {
+
+            const tbody =
+                document.getElementById(
+                    "vehicleTableBody"
+                );
+
+
+            tbody.innerHTML = "";
+
+
+            if (vehicles.length === 0) {
+
+                tbody.innerHTML =
+                    `<tr>
+                        <td colspan="4" class="empty">
+                            No vehicles added.
+                        </td>
+                    </tr>`;
+
+                return;
+            }
+
+
+            vehicles.forEach((vehicle, index) => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${vehicle.id}</td>
+
+                    <td>${vehicle.name}</td>
+
+                    <td>Available</td>
+
+                <td>
+
+    <button
+        class="success"
+        onclick="completeVehicle(${index})">
+        Complete Task
+    </button>
+
+    <button
+        class="danger"
+        onclick="deleteVehicle(${index})">
+        Delete
+    </button>
+
+</td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+ 
+       }
+
+
+        // =========================
+        // DELETE VEHICLE
+        // =========================
+
+        function deleteVehicle(index) {
+
+            vehicles.splice(index, 1);
+
+            displayVehicles();
+        }
+
+function completeVehicle(index) {
+
+    if (vehicles[index].status !== "Busy") {
+
+        alert("This vehicle is not currently busy.");
+
+        return;
+    }
+
+    vehicles[index].status = "Available";
+
+    displayVehicles();
+
+    alert(
+        vehicles[index].name +
+        " is now Available."
+    );
+}
+
+
+        // =========================
+        // ALLOCATE VEHICLES
+        // =========================
+
+        async function allocateVehicles() {
+
+    if (tasks.length === 0) {
+
+        alert("Please add delivery tasks first.");
+
+        return;
+    }
+
+    if (vehicles.length === 0) {
+
+        alert("Please add at least one vehicle.");
+
+        return;
+    }
+
+    if (scheduledTasks.length === 0) {
+
+        alert("Please run a scheduling algorithm first.");
 
         return;
     }
 
 
-    tasks.push({
+    const response =
+        await fetch("/allocate", {
 
-        id: "D" + taskCounter,
+            method: "POST",
 
-        location: location,
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-        priority: priority,
+            body: JSON.stringify({
 
-        burst: burst
+    tasks: scheduledTasks,
 
-    });
+    vehicles: vehicles
+        .filter(vehicle => vehicle.status === "Available")
+        .map(vehicle => vehicle.name)
 
-
-    taskCounter++;
-
-
-    document.getElementById("location").value = "";
-
-    document.getElementById("priority").value = "";
-
-    document.getElementById("burst").value = "";
-
-
-    displayTasks();
-
-}
-
-
-function displayTasks() {
-
-    const table =
-        document.getElementById("taskTable");
-
-
-    table.innerHTML = "";
-
-
-    tasks.forEach((task, index) => {
-
-        table.innerHTML += `
-
-        <tr>
-
-            <td>${task.id}</td>
-
-            <td>${task.location}</td>
-
-            <td>${task.priority}</td>
-
-            <td>${task.burst}</td>
-
-            <td>
-
-                <button
-                    class="delete-btn"
-                    onclick="deleteTask(${index})">
-
-                    Delete
-
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-}
-
-
-function deleteTask(index) {
-
-    tasks.splice(index, 1);
-
-    displayTasks();
-
-}
-
-
-function selectAlgorithm(algorithm, button) {
-
-    selectedAlgorithm = algorithm;
-
-
-    document
-        .querySelectorAll(".algorithm-btn")
-        .forEach(btn => {
-
-            btn.classList.remove("active");
+})
 
         });
 
 
-    button.classList.add("active");
+    const result =
+    await response.json();
 
-}
+result.forEach(item => {
 
+    if (item.status === "Assigned") {
 
-async function runScheduler() {
+        const vehicle = vehicles.find(
+            v => v.name === item.vehicle
+        );
 
-    if (tasks.length === 0) {
-
-        alert("Please add at least one task.");
-
-        return;
-
+        if (vehicle) {
+            vehicle.status = "Busy";
+        }
     }
 
+});
 
-    const response = await fetch("/schedule", {
+displayAllocation(result);
 
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-            tasks: tasks,
-
-            algorithm: selectedAlgorithm
-
-        })
-
-    });
-
-
-    const result =
-        await response.json();
-
-
-    displayResult(result);
-
+displayVehicles();
 }
+                   
 
 
-function displayResult(result) {
+        // =========================
+        // DISPLAY ALLOCATION
+        // =========================
 
-    let html = `
+        function displayAllocation(result) {
 
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Order</th>
-                    <th>Task</th>
-                    <th>Location</th>
-                    <th>Burst Time</th>
-                    <th>Waiting Time</th>
-                    <th>Turnaround Time</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-    `;
+            const tbody =
+                document.getElementById(
+                    "allocationTableBody"
+                );
 
 
-    result.forEach((task, index) => {
-
-        html += `
-
-            <tr>
-
-                <td>${index + 1}</td>
-
-                <td>${task.id}</td>
-
-                <td>${task.location}</td>
-
-                <td>${task.burst}</td>
-
-                <td>${task.waiting}</td>
-
-                <td>${task.turnaround}</td>
-
-            </tr>
-
-        `;
-
-    });
+            tbody.innerHTML = "";
 
 
-    html += `
+            result.forEach(item => {
 
-            </tbody>
-
-        </table>
-
-    `;
+                const row =
+                    document.createElement("tr");
 
 
-    document.getElementById("result").innerHTML = html;
+                const statusClass =
+                    item.status === "Assigned"
+                        ? "status-assigned"
+                        : "status-waiting";
 
-}
 
-</script>
+                row.innerHTML = `
+
+                    <td>${item.task_id}</td>
+
+                    <td>${item.location}</td>
+
+                    <td>${item.vehicle}</td>
+
+                    <td class="${statusClass}">
+                        ${item.status}
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+        }
+
+    </script>
 
 </body>
+
 </html>
