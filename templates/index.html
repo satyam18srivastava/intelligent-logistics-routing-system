@@ -305,6 +305,72 @@
 
         </div>
 
+<!-- SCHEDULING METRICS -->
+<div class="card">
+    <h2>📈 Scheduling Performance</h2>
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <h3>Average Waiting Time</h3>
+            <p id="averageWaitingTime">—</p>
+        </div>
+
+        <div style="flex: 1; min-width: 200px;">
+            <h3>Average Turnaround Time</h3>
+            <p id="averageTurnaroundTime">—</p>
+        </div>
+    </div>
+</div>
+
+<!-- GANTT CHART -->
+<div class="card">
+    <h2>📊 Scheduling Gantt Chart</h2>
+    <div id="ganttChart"
+         style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;">
+        Run the scheduler to display the Gantt chart.
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- SHORTEST PATH ROUTING -->
+<!-- ========================= -->
+
+<div class="card">
+    <h2>🗺️ Shortest Path Routing</h2>
+
+    <div class="form-row">
+        <div>
+            <label for="routeSource">Source Location</label>
+            <select id="routeSource">
+                <option value="NIET">NIET</option>
+                <option value="Knowledge Park">Knowledge Park</option>
+                <option value="Pari Chowk">Pari Chowk</option>
+                <option value="Sector 62">Sector 62</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="routeDestination">Destination Location</label>
+            <select id="routeDestination">
+                <option value="Sector 62">Sector 62</option>
+                <option value="NIET">NIET</option>
+                <option value="Knowledge Park">Knowledge Park</option>
+                <option value="Pari Chowk">Pari Chowk</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="success" onclick="findShortestRoute()">
+        Find Shortest Route
+    </button>
+
+    <div id="routeResult" style="margin-top:20px;">
+        Select locations to calculate a route.
+    </div>
+</div>
+
+
 
         <!-- ========================= -->
         <!-- VEHICLE SECTION -->
@@ -321,6 +387,14 @@
                     id="vehicleName"
                     placeholder="Vehicle Name (e.g. Vehicle 1)"
                 >
+
+<select id="vehicleLocation">
+    <option value="NIET">NIET</option>
+    <option value="Knowledge Park">Knowledge Park</option>
+    <option value="Pari Chowk">Pari Chowk</option>
+    <option value="Sector 62">Sector 62</option>
+</select>
+
 
                 <button
                     class="success"
@@ -418,127 +492,116 @@
         // ADD TASK
         // =========================
 
-        function addTask() {
 
-            const location =
-                document.getElementById("location").value;
+function addTask() {
 
-            const priority =
-                parseInt(
-                    document.getElementById("priority").value
-                );
+    const location =
+        document.getElementById("location").value.trim();
 
-            const burst =
-                parseInt(
-                    document.getElementById("burst").value
-                );
+    const priority =
+        parseInt(document.getElementById("priority").value);
 
+    const burst =
+        parseInt(document.getElementById("burst").value);
 
-            if (!location || !priority || !burst) {
+    if (!location || !Number.isInteger(priority) ||
+        priority <= 0 || !Number.isInteger(burst) ||
+        burst <= 0) {
 
-                alert("Please enter all task details.");
+        alert("Please enter a location and valid positive priority and burst values.");
+        return;
+    }
 
-                return;
-            }
+    const task = {
+        id: "D" + Date.now(),
+        location: location,
+        priority: priority,
+        burst: burst,
+        status: "Pending",
+        assignedVehicle: null
+    };
 
+    tasks.push(task);
 
-            const task = {
+    scheduledTasks = [];
 
-                id: "D" + (tasks.length + 1),
+    displayTasks();
 
-                location: location,
-
-                priority: priority,
-
-                burst: burst
-
-            };
-
-
-            tasks.push(task);
-
-
-            displayTasks();
-
-
-            document.getElementById("location").value = "";
-
-            document.getElementById("priority").value = "";
-
-            document.getElementById("burst").value = "";
-        }
+    document.getElementById("location").value = "";
+    document.getElementById("priority").value = "";
+    document.getElementById("burst").value = "";
+}
 
 
         // =========================
         // DISPLAY TASKS
         // =========================
 
-        function displayTasks() {
 
-            const tbody =
-                document.getElementById("taskTableBody");
+function displayTasks() {
 
+    const tbody = document.getElementById("taskTableBody");
 
-            tbody.innerHTML = "";
+    tbody.innerHTML = "";
 
+    if (tasks.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    No delivery tasks added.
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
-            if (tasks.length === 0) {
+    tasks.forEach((task, index) => {
 
-                tbody.innerHTML =
-                    `<tr>
-                        <td colspan="5" class="empty">
-                            No delivery tasks added.
-                        </td>
-                    </tr>`;
+        const row = document.createElement("tr");
 
-                return;
-            }
+        row.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.location}</td>
+            <td>${task.priority}</td>
+            <td>${task.burst}</td>
+            <td>${task.status || "Pending"}</td>
+            <td>
+                <button
+                    class="danger"
+                    onclick="deleteTask(${index})">
+                    Delete
+                </button>
+            </td>
+        `;
 
-
-            tasks.forEach((task, index) => {
-
-                const row = document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>${task.id}</td>
-
-                    <td>${task.location}</td>
-
-                    <td>${task.priority}</td>
-
-                    <td>${task.burst}</td>
-
-                    <td>
-                        <button
-                            class="danger"
-                            onclick="deleteTask(${index})">
-                            Delete
-                        </button>
-                    </td>
-
-                `;
-
-
-                tbody.appendChild(row);
-
-            });
-
-        }
+        tbody.appendChild(row);
+    });
+}
 
 
         // =========================
         // DELETE TASK
-        // =========================
+function deleteTask(index) {
 
-        function deleteTask(index) {
+    const task = tasks[index];
 
-            tasks.splice(index, 1);
+    if (!task) {
+        alert("Task not found.");
+        return;
+    }
 
-            displayTasks();
-        }
+    if (task.status === "Assigned") {
+        alert("Cannot delete an assigned task. Complete it first.");
+        return;
+    }
 
+    tasks.splice(index, 1);
+
+    scheduledTasks = [];
+
+    displayTasks();
+
+}
 
         // =========================
         // SELECT ALGORITHM
@@ -594,51 +657,56 @@
         // RUN SCHEDULER
         // =========================
 
-        async function runScheduler() {
-
-            if (tasks.length === 0) {
-
-                alert("Please add delivery tasks first.");
-
-                return;
-            }
 
 
-            if (!selectedAlgorithm) {
+async function runScheduler() {
 
-                alert("Please select a scheduling algorithm.");
+    if (tasks.length === 0) {
+        alert("Please add delivery tasks first.");
+        return;
+    }
 
-                return;
-            }
+    if (!selectedAlgorithm) {
+        alert("Please select a scheduling algorithm.");
+        return;
+    }
 
+    try {
+        const response = await fetch("/schedule", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                tasks: tasks,
+                algorithm: selectedAlgorithm
+            })
+        });
 
-            const response =
-                await fetch("/schedule", {
+        const data = await response.json();
 
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        tasks: tasks,
-
-                        algorithm: selectedAlgorithm
-
-                    })
-
-                });
-
-
-            const result =
-                await response.json();
-
-            scheduledTasks = result;
-
-            displayResult(result);
+        if (!response.ok) {
+            alert(data.error || "Scheduling failed.");
+            return;
         }
+
+        scheduledTasks = data.results;
+
+        displayResult(scheduledTasks);
+
+        document.getElementById("averageWaitingTime").textContent =
+            data.average_waiting_time;
+
+        document.getElementById("averageTurnaroundTime").textContent =
+            data.average_turnaround_time;
+
+        displayGantt(scheduledTasks);
+
+    } catch (error) {
+        console.error(error);
+        alert("Could not connect to the scheduling server.");
+    }
+}
 
 
         // =========================
@@ -688,6 +756,109 @@
         }
 
 
+function displayGantt(result) {
+
+    const container = document.getElementById("ganttChart");
+
+    container.innerHTML = "";
+
+    if (!result || result.length === 0) {
+        container.textContent = "No scheduling data available.";
+        return;
+    }
+
+    result.forEach(task => {
+
+        const block = document.createElement("div");
+
+        block.style.cssText = `
+            min-width:100px;
+            flex:1 1 100px;
+            padding:14px 10px;
+            border:1px solid #888;
+            border-radius:8px;
+            text-align:center;
+            overflow-wrap:anywhere;
+        `;
+
+        block.innerHTML = `
+            <strong>${task.id}</strong>
+            <div>${task.location}</div>
+            <div>Start: ${task.waiting}</div>
+            <div>End: ${task.turnaround}</div>
+            <div>Duration: ${task.burst}</div>
+        `;
+
+        container.appendChild(block);
+    });
+}
+
+
+async function findShortestRoute() {
+
+    const source =
+        document.getElementById("routeSource").value;
+
+    const destination =
+        document.getElementById("routeDestination").value;
+
+    const output =
+        document.getElementById("routeResult");
+
+    if (source === destination) {
+        output.textContent =
+            "Source and destination are the same location. Distance: 0 km.";
+        return;
+    }
+
+    output.textContent = "Calculating shortest route...";
+
+    try {
+        const response = await fetch("/route", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                source: source,
+                destination: destination
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            output.textContent =
+                data.error || "Unable to calculate route.";
+            return;
+        }
+
+        output.innerHTML = "";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "Shortest Route";
+
+        const path = document.createElement("p");
+        path.textContent = data.path.join(" → ");
+
+        const distance = document.createElement("p");
+        distance.textContent =
+            "Total Distance: " + data.total_distance + " " + data.unit;
+
+        output.appendChild(heading);
+        output.appendChild(path);
+        output.appendChild(distance);
+
+    } catch (error) {
+        console.error(error);
+        output.textContent =
+            "Could not connect to the routing server.";
+    }
+}
+
+
+
+
         // =========================
         // ADD VEHICLE
         // =========================
@@ -708,14 +879,13 @@
             }
 
 
-            const vehicle = {
 
+const vehicle = {
     id: "V" + (vehicles.length + 1),
-
     name: name,
-
-    status: "Available"
-
+    location: document.getElementById("vehicleLocation").value,
+    status: "Available",
+    currentTaskId: null
 };
 
 
@@ -735,70 +905,46 @@
         // DISPLAY VEHICLES
         // =========================
 
-        function displayVehicles() {
 
-            const tbody =
-                document.getElementById(
-                    "vehicleTableBody"
-                );
+function displayVehicles() {
+    const tbody = document.getElementById("vehicleTableBody");
 
+    tbody.innerHTML = "";
 
-            tbody.innerHTML = "";
+    if (vehicles.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="empty">
+                    No vehicles added.
+                </td>
+            </tr>
+        `;
+        return;
+    }
 
+    vehicles.forEach((vehicle, index) => {
+        const row = document.createElement("tr");
 
-            if (vehicles.length === 0) {
+        row.innerHTML = `
+            <td>${vehicle.id}</td>
+            <td>${vehicle.name}</td>
+            <td>${vehicle.status}</td>
+            <td>
+                <button class="success"
+                    onclick="completeVehicle(${index})">
+                    Complete Task
+                </button>
 
-                tbody.innerHTML =
-                    `<tr>
-                        <td colspan="4" class="empty">
-                            No vehicles added.
-                        </td>
-                    </tr>`;
+                <button class="danger"
+                    onclick="deleteVehicle(${index})">
+                    Delete
+                </button>
+            </td>
+        `;
 
-                return;
-            }
-
-
-            vehicles.forEach((vehicle, index) => {
-
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>${vehicle.id}</td>
-
-                    <td>${vehicle.name}</td>
-
-                    <td>Available</td>
-
-                <td>
-
-    <button
-        class="success"
-        onclick="completeVehicle(${index})">
-        Complete Task
-    </button>
-
-    <button
-        class="danger"
-        onclick="deleteVehicle(${index})">
-        Delete
-    </button>
-
-</td>
-
-                `;
-
-
-                tbody.appendChild(row);
-
-            });
-
- 
-       }
-
+        tbody.appendChild(row);
+    });
+}
 
         // =========================
         // DELETE VEHICLE
@@ -811,23 +957,93 @@
             displayVehicles();
         }
 
-function completeVehicle(index) {
 
-    if (vehicles[index].status !== "Busy") {
+async function completeVehicle(index) {
 
+    const vehicle = vehicles[index];
+
+    if (!vehicle || vehicle.status !== "Busy") {
         alert("This vehicle is not currently busy.");
-
         return;
     }
 
-    vehicles[index].status = "Available";
+    vehicle.status = "Available";
+const completedTask = tasks.find(
+    task => task.id === vehicle.currentTaskId
+);
+
+if (completedTask) {
+    completedTask.status = "Completed";
+    completedTask.assignedVehicle = null;
+}
+
+vehicle.currentTaskId = null;
+
+    // Find a pending task from the current schedule
+    const pendingTask = scheduledTasks.find(task => {
+        const originalTask = tasks.find(t => t.id === task.id);
+
+        return originalTask &&
+            originalTask.status === "Pending";
+    });
+
+    if (pendingTask) {
+        try {
+            const response = await fetch("/allocate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                
+body: JSON.stringify({
+    tasks: [pendingTask],
+    vehicles: [{
+        name: vehicle.name,
+        location: vehicle.location
+    }]
+})
+
+            });
+
+            if (!response.ok) {
+                throw new Error("Allocation failed");
+            }
+
+            const result = await response.json();
+
+            if (result.length > 0 && result[0].status === "Assigned") {
+                vehicle.status = "Busy";
+vehicle.currentTaskId = result[0].task_id;
+                const originalTask = tasks.find(
+                    task => task.id === result[0].task_id
+                );
+
+                if (originalTask) {
+                    originalTask.status = "Assigned";
+                    originalTask.assignedVehicle = vehicle.name;
+                }
+
+                displayAllocation(result);
+                displayVehicles();
+                displayTasks();
+
+                alert(
+                    vehicle.name +
+                    " completed its previous task and was assigned a pending task."
+                );
+
+                return;
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Vehicle is available, but pending task allocation failed.");
+        }
+    }
 
     displayVehicles();
 
-    alert(
-        vehicles[index].name +
-        " is now Available."
-    );
+    alert(vehicle.name + " is now Available.");
 }
 
 
@@ -835,73 +1051,93 @@ function completeVehicle(index) {
         // ALLOCATE VEHICLES
         // =========================
 
-        async function allocateVehicles() {
+
+async function allocateVehicles() {
 
     if (tasks.length === 0) {
-
         alert("Please add delivery tasks first.");
-
         return;
     }
 
     if (vehicles.length === 0) {
-
         alert("Please add at least one vehicle.");
-
         return;
     }
 
     if (scheduledTasks.length === 0) {
-
         alert("Please run a scheduling algorithm first.");
-
         return;
     }
 
+    
+const availableVehicles = vehicles
+    .filter(vehicle => vehicle.status === "Available")
+    .map(vehicle => ({
+        name: vehicle.name,
+        location: vehicle.location
+    }));
 
-    const response =
-        await fetch("/allocate", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-    tasks: scheduledTasks,
-
-    vehicles: vehicles
-        .filter(vehicle => vehicle.status === "Available")
-        .map(vehicle => vehicle.name)
-
-})
-
-        });
-
-
-    const result =
-    await response.json();
-
-result.forEach(item => {
-
-    if (item.status === "Assigned") {
-
-        const vehicle = vehicles.find(
-            v => v.name === item.vehicle
+    const pendingTasks = scheduledTasks.filter(task => {
+        const originalTask = tasks.find(
+            t => t.id === task.id
         );
 
-        if (vehicle) {
-            vehicle.status = "Busy";
-        }
+        return originalTask &&
+            originalTask.status !== "Assigned" &&
+            originalTask.status !== "Completed";
+    });
+
+    if (availableVehicles.length === 0) {
+        alert("No vehicles are currently available.");
+        return;
     }
 
-});
+    if (pendingTasks.length === 0) {
+        alert("No pending tasks available for allocation.");
+        return;
+    }
 
-displayAllocation(result);
+    const response = await fetch("/allocate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            tasks: pendingTasks,
+            vehicles: availableVehicles
+        })
+    });
 
-displayVehicles();
+    if (!response.ok) {
+        alert("Vehicle allocation failed. Please try again.");
+        return;
+    }
+
+    const result = await response.json();
+
+    result.forEach(item => {
+        const originalTask = tasks.find(
+            t => t.id === item.task_id
+        );
+
+        if (item.status === "Assigned") {
+            const vehicle = vehicles.find(
+                v => v.name === item.vehicle
+            );
+
+if (vehicle) {
+    vehicle.status = "Busy";
+    vehicle.currentTaskId = item.task_id;
+}
+            if (originalTask) {
+                originalTask.status = "Assigned";
+                originalTask.assignedVehicle = item.vehicle;
+            }
+        }
+    });
+
+    displayAllocation(result);
+    displayVehicles();
 }
                    
 
