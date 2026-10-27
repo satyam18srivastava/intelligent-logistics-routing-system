@@ -380,6 +380,11 @@
 
             <h2>🚛 Vehicle / Resource Management</h2>
 
+<button class="danger" onclick="resetSystem()">
+    Reset System
+</button>
+
+
             <div class="form-row">
 
                 <input
@@ -420,10 +425,13 @@
                 <thead>
 
                     <tr>
-                        <th>Vehicle ID</th>
-                        <th>Vehicle Name</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        
+<th>Vehicle ID</th>
+<th>Vehicle Name</th>
+<th>Current Location</th>
+<th>Status</th>
+<th>Action</th>
+
                     </tr>
 
                 </thead>
@@ -914,7 +922,7 @@ function displayVehicles() {
     if (vehicles.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="4" class="empty">
+                <td colspan="5" class="empty">
                     No vehicles added.
                 </td>
             </tr>
@@ -926,9 +934,12 @@ function displayVehicles() {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${vehicle.id}</td>
-            <td>${vehicle.name}</td>
-            <td>${vehicle.status}</td>
+            
+<td>${vehicle.id}</td>
+<td>${vehicle.name}</td>
+<td>${vehicle.location || "Unknown"}</td>
+<td>${vehicle.status}</td>
+
             <td>
                 <button class="success"
                     onclick="completeVehicle(${index})">
@@ -957,6 +968,34 @@ function displayVehicles() {
             displayVehicles();
         }
 
+function resetSystem() {
+    const confirmed = confirm(
+        "Are you sure you want to reset the entire system? All tasks, vehicles, and scheduling results will be cleared."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    tasks = [];
+    vehicles = [];
+    selectedAlgorithm = "";
+    scheduledTasks = [];
+
+    document.getElementById("resultTableBody").innerHTML = "";
+    document.getElementById("averageWaitingTime").textContent = "—";
+    document.getElementById("averageTurnaroundTime").textContent = "—";
+    document.getElementById("ganttChart").textContent =
+        "Run the scheduler to display the Gantt chart.";
+
+    displayTasks();
+    displayVehicles();
+    displayAllocation([]);
+
+    alert("System reset successfully.");
+}
+
+
 
 async function completeVehicle(index) {
 
@@ -972,10 +1011,15 @@ const completedTask = tasks.find(
     task => task.id === vehicle.currentTaskId
 );
 
+
 if (completedTask) {
     completedTask.status = "Completed";
     completedTask.assignedVehicle = null;
+
+    // Update vehicle location after delivery
+    vehicle.location = completedTask.location;
 }
+
 
 vehicle.currentTaskId = null;
 
